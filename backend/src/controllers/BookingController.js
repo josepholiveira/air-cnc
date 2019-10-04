@@ -17,6 +17,12 @@ module.exports = {
       .populate("user")
       .execPopulate();
 
+    const ownerSocket = req.connected[booking.spot.user];
+
+    if (ownerSocket) {
+      req.io.to(ownerSocket).emit("booking_request", booking);
+    }
+
     return res.json(booking);
   }
 };

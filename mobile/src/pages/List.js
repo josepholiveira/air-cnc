@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
+import socketio from "socket.io-client";
 import {
   SafeAreaView,
+  Alert,
   ScrollView,
   StyleSheet,
   Image,
@@ -18,6 +20,22 @@ export default function List() {
     AsyncStorage.getItem("techs").then(storagedTechs => {
       const techsArray = storagedTechs.split(",").map(tech => tech.trim());
       setTechs(techsArray);
+    });
+  }, []);
+
+  useEffect(() => {
+    AsyncStorage.getItem("user").then(user_id => {
+      const socket = socketio("http://192.168.3.1:3333", {
+        query: { user_id }
+      });
+
+      socket.on("booking_response", booking => {
+        Alert.alert(
+          `Sua reserva em ${booking.spot.company} em ${booking.date} foi ${
+            booking.approved ? "APROVADA" : "REJEITADA"
+          }`
+        );
+      });
     });
   }, []);
 
